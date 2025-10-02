@@ -1,0 +1,10 @@
+version: '3.9'
+
+services:
+  fastapi-app:
+    build: .
+    container_name: fastapi-app
+    ports:
+      - "8009:8001"
+    volumes:
+      - .:/app   # чтобы изменения в коде сразу отражались
