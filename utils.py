@@ -7,39 +7,14 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-
-def extract_text_from_base64(image_base64: str, lang: str = "rus") -> str:
+def extract_text_from_base64(image_base64, lang='rus'):
     try:
-        s = image_base64.strip()
-
-        # 1) Если это data URL — отрезаем префикс
-        if s.startswith("data:"):
-            s = s.split(",", 1)[1]
-
-        # 2) Убираем переводы строк и приводим пробелы/плюсы
-        s = s.replace("\n", "").replace("\r", "")
-        s = s.replace(" ", "+")  # на случай x-www-form-urlencoded
-
-        # 3) Приводим urlsafe к обычному Base64
-        s = s.replace("-", "+").replace("_", "/")
-
-        # 4) Добиваем паддинг до кратности 4
-        s += "=" * (-len(s) % 4)
-
-        # 5) Декодирование (валидация поймает мусор)
-        img_bytes = base64.b64decode(s, validate=True)
-
-    except (binascii.Error, ValueError) as e:
-        logger.error(f"Ошибка декодирования Base64: {e}")
-        return ""
-
-    try:
-        with Image.open(io.BytesIO(img_bytes)) as img:
-            img = img.convert("RGB")  # на всякий случай
-            text = pytesseract.image_to_string(img, lang=lang)
-            return text.strip()
+        image_data = base64.b64decode(image_base64)
+        image = Image.open(io.BytesIO(image_data))
+        text = pytesseract.image_to_string(image, lang=lang)
+        return text.strip()
     except Exception as e:
-        logger.error(f"Ошибка распознавания текста OCR: {e}")
+        logger.error(f"Ошибка распознавания текста: {str(e)}")
         return ""
 
 def image_to_base64(image_path):
