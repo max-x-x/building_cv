@@ -28,7 +28,7 @@ def image_to_base64(image_path):
 
 def send_text_to_external_api(text: str, image_index: int):
     try:
-        external_url = "https://building-ai.itc-hub.ru/extract"
+        external_url = "https://building-ai.itc-hub.ru/api/extract"
         payload = {"text": text}
         
         logger.info(f"Отправляю текст для изображения {image_index + 1} во внешний API")
