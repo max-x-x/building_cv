@@ -43,10 +43,14 @@ async def extract_text(request: ImageRequest):
             
             if external_api_result and 'result' in external_api_result:
                 try:
-                    structured_data = json.loads(external_api_result['result'])
+                    # external_api_result['result'] уже является словарем, не нужно json.loads()
+                    if isinstance(external_api_result['result'], str):
+                        structured_data = json.loads(external_api_result['result'])
+                    else:
+                        structured_data = external_api_result['result']
                     results.append(ProcessedData(data=structured_data, file_url=file_url))
                     logger.info(f"Изображение {i + 1} обработано")
-                except json.JSONDecodeError as e:
+                except (json.JSONDecodeError, TypeError) as e:
                     logger.error(f"Ошибка разбора JSON для изображения {i + 1}: {e}")
                     empty_data = {
                         "Наименование материала": "",
